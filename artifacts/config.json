@@ -1,0 +1,7 @@
+{
+  "ticker": "VALE3.SA",
+  "feature": "Close",
+  "n_steps": 60,
+  "n_features": 1,
+  "horizon": 1
+}

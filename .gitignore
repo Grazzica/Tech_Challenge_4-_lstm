@@ -1,0 +1,25 @@
+# ambiente virtual
+.venv/
+venv/
+
+# cache Python
+__pycache__/
+*.pyc
+*.pyo
+
+# artefatos de modelo (decisão abaixo)
+# artifacts/
+
+# dados baixados
+*.csv
+*.parquet
+
+# gráficos gerados
+*.png
+
+# IDE
+.vscode/
+.idea/
+
+# sistema
+.DS_Store
