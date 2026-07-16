@@ -4,7 +4,7 @@ from fastapi import FastAPI
 from api.schemas import PredictRequest, PredictResponse
 from api.inference import prever, TICKER
 
-# ---- logging: base do monitoramento (requisito 5) ----
+# ---- logging: base do monitoramento ----
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("tc4-api")
 
@@ -28,12 +28,10 @@ def health_check():
     return {"status": "ok"}
 
 # ---- ROTA 2: predição ----
-# TODO: POST /predict que recebe PredictRequest, chama prever(), retorna PredictResponse
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
    resultado =  prever(request.closes)
    return PredictResponse(prediction = resultado, ticker=TICKER)
-
 
 # ---- ROTA RAIZ ----
 @app.get("/")
