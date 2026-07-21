@@ -57,10 +57,10 @@ y_test_2d = y_test.reshape(-1,1)
 pred = scaler.inverse_transform(pred_esc)
 real = scaler.inverse_transform(y_test_2d)
 
-MAE = np.abs(np.mean(pred - real))
+MAE = np.mean(np.abs(pred - real))
 MSE = np.mean((pred - real) ** 2)
 RMSE = np.sqrt(MSE)
-MAPE = np.abs(np.mean((pred-real)/real*100))
+MAPE = np.mean(np.abs((pred - real) / real)) * 100
 
 print(f"MAE: {MAE}, RMSE: {RMSE}, MAPE: {MAPE}")
 
