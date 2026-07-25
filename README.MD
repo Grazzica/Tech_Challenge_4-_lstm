@@ -83,7 +83,7 @@ tc4-vale3/
 │   ├── data.py            # coleta (yfinance) e pre-processamento
 │   ├── model.py           # definicao da classe ModeloLSTM
 │   ├── train.py           # treino, avaliacao e salvamento de artefatos
-│   ├── test_inference.py  # teste isolado da logica de predicao
+│   ├── demo_teste.py      # testa a API em producao contra dados reais (2025/2026)
 │   └── api/
 │       ├── __init__.py
 │       ├── main.py        # app FastAPI, rotas e middleware de monitoramento
@@ -135,17 +135,30 @@ Métricas no conjunto de teste (des-normalizadas, em reais):
 
 | Métrica | Valor |
 |---------|-------|
-| MAE | R$ 0,26 |
-| RMSE | R$ 1,82 |
-| MAPE | 0,57% |
+| MAE | R$ 1,72 |
+| RMSE | R$ 2,20 |
+| MAPE | 2,70% |
 
 ![Real vs Previsto](artifacts/previsao_vs_real.png)
 
-**Leitura:** o modelo captura bem a tendência de médio prazo, mas suaviza a volatilidade diária de curto prazo. O RMSE superior ao MAE indica que os erros se concentram nos dias de maior variação. Observa-se um leve atraso na resposta — característico de previsão univariada baseada em janela histórica —, o que impõe cautela na interpretação do poder preditivo para horizontes de negociação.
+**Leitura:** o modelo captura bem a tendência de médio prazo, mas suaviza a volatilidade diária de curto prazo. Um MAPE de ~2,7% indica erro médio inferior a 3% do valor do ativo — resultado sólido para previsão univariada. Observa-se um leve atraso na resposta do modelo, característico de previsão baseada em janela histórica de um único sinal (o próprio preço), o que impõe cautela na interpretação do poder preditivo para horizontes de negociação.
+
+### Validação com dados reais (fora do treino)
+
+O script `src/demo_teste.py` consome a **API em produção** e compara a previsão com o fechamento real de pregões que o modelo nunca viu (o treino usou dados até 2024):
+
+| Data-alvo | Previsto | Real | Erro |
+|-----------|----------|------|------|
+| 2025-06-16 | R$ 49,27 | R$ 49,42 | 0,29% |
+| 2026-06-16 | R$ 73,71 | R$ 81,44 | 9,50% |
+
+O caso de 2025 (preços dentro da faixa histórica de treino) apresenta erro mínimo. Já o de 2026, quando a VALE3 ultrapassou o máximo histórico do período de treino (~R$ 73), apresenta erro maior — o modelo **extrapola mal fora da faixa em que foi treinado**, tendendo a subestimar valores acima do teto conhecido. Este comportamento é esperado e ilustra um princípio central de ML em produção: modelos são confiáveis dentro da distribuição de dados vista no treino, exigindo retreino periódico com dados recentes.
 
 ---
 
 ## Como executar
+
+A API já está hospedada e disponível para consumo (ver seção [Deploy](#deploy)) — **não é necessário rodar nada localmente para testá-la**. As opções abaixo são para quem deseja reproduzir o projeto na própria máquina.
 
 ### Pré-requisitos
 - Python 3.11+
@@ -183,7 +196,11 @@ A API fica disponível em `http://localhost:8000`.
 
 ## Uso da API
 
-Documentação interativa (Swagger) gerada automaticamente: **`http://localhost:8000/docs`**
+**API em produção:** `http://50.17.38.186:8000`
+
+Documentação interativa (Swagger) gerada automaticamente: **`http://50.17.38.186:8000/docs`**
+
+> Para uso local, substitua o endereço por `http://localhost:8000`.
 
 ### Rotas
 
@@ -196,7 +213,7 @@ Documentação interativa (Swagger) gerada automaticamente: **`http://localhost:
 ### Exemplo de requisição
 
 ```bash
-curl -X POST "http://localhost:8000/predict" \
+curl -X POST "http://50.17.38.186:8000/predict" \
   -H "Content-Type: application/json" \
   -d '{"closes": [58.2, 58.5, 57.9, ... 60 valores ...]}'
 ```
@@ -211,6 +228,17 @@ curl -X POST "http://localhost:8000/predict" \
 ```
 
 O tempo de processamento de cada requisição é registrado em log e devolvido no header `X-Process-Time-ms`.
+
+### Validação automatizada
+
+Para validar a API em produção contra dados reais não vistos no treino:
+
+```bash
+cd src
+python3 demo_teste.py
+```
+
+O script busca os 60 pregões anteriores a cada data-alvo, envia à API e compara a previsão com o fechamento real do dia.
 
 ---
 
@@ -241,12 +269,14 @@ Um middleware mede a latência de todas as requisições, registrando no log do 
 
 ## Deploy
 
-- API disponível em: 
-- Vídeo apresentação disponível em: 
+- API disponível em: http://50.17.38.186:8000/
+- Documentação interativa: http://50.17.38.186:8000/docs
+- Vídeo de apresentação disponível em: 
 
 ---
 
 ## Autores
+
 **Adriano Cabrera**
 
 - LinkedIn: https://www.linkedin.com/in/adriano-cabrera-b7b680a7/
@@ -262,8 +292,6 @@ Um middleware mede a latência de todas as requisições, registrando no log do 
 - LinkedIn: https://www.linkedin.com/in/fabriciobdias/
 - GitHub: https://github.com/DiasFabricio
 
-___
+---
 
 **Desenvolvido como parte do Tech Challenge — Pós-Graduação em Machine Learning Engineering — FIAP 2025/2026**
-
-

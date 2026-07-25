@@ -73,7 +73,7 @@ plt.ylabel("Preço (R$)")
 plt.legend()
 plt.grid(True, alpha=0.3)
 plt.tight_layout()
-plt.text(-0.5, 48, f"MAE: {MAE}\nMSE: {RMSE}\nMAPE: {MAPE}" )
+plt.text(-0.5, 48, f"MAE: {MAE:.2f}\nRMSE: {RMSE:.2f}\nMAPE: {MAPE:.2f}%" )
 plt.savefig("../artifacts/previsao_vs_real.png", dpi=120)  # salva para o vídeo/README
 plt.show()  # abre a janela interativa
 
