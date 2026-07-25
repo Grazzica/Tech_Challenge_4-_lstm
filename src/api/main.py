@@ -33,7 +33,7 @@ async def medir_tempo(request, call_next):
 def health_check():
     return {"status": "ok"}
 
-# ---- ROTA: métricas de recursos (monitoramento de CPU/memória) ----
+# ---- ROTA 2: métricas de recursos (monitoramento de CPU/memória) ----
 @app.get("/metrics")
 def metrics():
     mem = psutil.virtual_memory()
@@ -51,7 +51,7 @@ def metrics():
         "uptime_segundos": round(time.time() - inicio_app, 1),
     }
 
-# ---- ROTA 2: predição ----
+# ---- ROTA 3: predição ----
 @app.post("/predict", response_model=PredictResponse)
 def predict(request: PredictRequest):
    resultado =  prever(request.closes)

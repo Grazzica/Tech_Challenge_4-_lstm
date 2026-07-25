@@ -208,6 +208,7 @@ Documentação interativa (Swagger) gerada automaticamente: **`http://50.17.38.1
 |--------|------|-----------|
 | `GET` | `/` | Informações da API |
 | `GET` | `/health` | Health check (usado por orquestradores) |
+| `GET` | `/metrics` | Utilização de recursos: CPU, memória e uptime |
 | `POST` | `/predict` | Recebe 60 closes brutos e retorna a previsão do próximo pregão |
 
 ### Exemplo de requisição
@@ -244,7 +245,11 @@ O script busca os 60 pregões anteriores a cada data-alvo, envia à API e compar
 
 ## Monitoramento
 
-Um middleware mede a latência de todas as requisições, registrando no log do servidor e expondo o valor no header `X-Process-Time-ms` de cada resposta. O endpoint `/health` permite verificação de disponibilidade por ferramentas externas.
+O monitoramento cobre os dois eixos exigidos — tempo de resposta e utilização de recursos:
+
+- **Latência:** um middleware mede o tempo de processamento de todas as requisições, registrando no log do servidor e expondo o valor no header `X-Process-Time-ms` de cada resposta.
+- **Recursos:** o endpoint `GET /metrics` reporta o consumo de CPU e memória (do sistema e do processo da API) e o uptime da aplicação, via `psutil`.
+- **Disponibilidade:** o endpoint `GET /health` permite verificação de disponibilidade por ferramentas externas e orquestradores.
 
 ---
 
@@ -253,6 +258,7 @@ Um middleware mede a latência de todas as requisições, registrando no log do 
 - **Modelagem:** PyTorch (LSTM)
 - **Dados:** yfinance, pandas, NumPy, scikit-learn (MinMaxScaler)
 - **API:** FastAPI, Pydantic, Uvicorn
+- **Monitoramento:** psutil (CPU/memória), middleware de latência
 - **Serialização:** joblib (scaler), state_dict (modelo)
 - **Containerização:** Docker
 
