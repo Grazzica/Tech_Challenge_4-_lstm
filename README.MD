@@ -277,7 +277,7 @@ O monitoramento cobre os dois eixos exigidos — tempo de resposta e utilizaçã
 
 - API disponível em: http://50.17.38.186:8000/
 - Documentação interativa: http://50.17.38.186:8000/docs
-- Vídeo de apresentação disponível em: 
+- Vídeo de apresentação disponível em: https://youtu.be/nCs6wzhf9Aw
 
 ---
 
